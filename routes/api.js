@@ -1,6 +1,6 @@
 const express = require('express');
 const { generateDreamOutcome, getGuidedQuestions } = require('../controllers/dreamOutcomeController');
-const { generateGuarantees } = require('../controllers/guaranteeController');
+const { generateGuarantees, getGuidedQuestions: getGuaranteeQuestions } = require('../controllers/guaranteeController');
 const { generateBonuses } = require('../controllers/bonusController');
 const { assembleOffer } = require('../controllers/offerController');
 
@@ -10,8 +10,11 @@ const router = express.Router();
 router.post('/dream-outcome', generateDreamOutcome);
 router.get('/dream-outcome/questions', getGuidedQuestions);
 
-// Other endpoints
+// Guarantee endpoints
 router.post('/guarantees', generateGuarantees);
+router.get('/guarantees/questions', getGuaranteeQuestions);
+
+// Other endpoints
 router.post('/bonuses', generateBonuses);
 router.post('/assemble-offer', assembleOffer);
 
