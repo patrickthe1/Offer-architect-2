@@ -2,7 +2,7 @@ const express = require('express');
 const { generateDreamOutcome, getGuidedQuestions } = require('../controllers/dreamOutcomeController');
 const { generateGuarantees, getGuidedQuestions: getGuaranteeQuestions } = require('../controllers/guaranteeController');
 const { generateBonuses, getBonusQuestions, generateGuidedBonuses } = require('../controllers/bonusController');
-const { assembleOffer } = require('../controllers/offerController');
+const { assembleOffer, analyzePricing, assemblePremiumOffer } = require('../controllers/offerController');
 
 const router = express.Router();
 
@@ -19,7 +19,9 @@ router.post('/bonuses', generateBonuses);
 router.get('/bonuses/questions', getBonusQuestions);
 router.post('/bonuses/guided', generateGuidedBonuses);
 
-// Other endpoints
+// Offer Assembly endpoints
 router.post('/assemble-offer', assembleOffer);
+router.post('/analyze-pricing', analyzePricing);
+router.post('/assemble-premium-offer', assemblePremiumOffer);
 
 module.exports = router;
