@@ -11,24 +11,55 @@ OFFER CONTEXT:
 
 PRICING DESCRIPTION: "${pricingDescription}"
 
-Provide a comprehensive pricing analysis as JSON:
+IMPORTANT: Respond with ONLY a valid JSON object. No markdown, no code blocks, no extra text. Use this exact format:
+
 {
-  "recommendedPrice": "$X,XXX",
-  "priceJustification": "Why this price works psychologically...",
-  "valueStackTotal": "$XX,XXX",
-  "pricingStrategy": "anchor|value|psychology-based",
-  "improvements": ["improvement1", "improvement2"],
-  "psychologyTips": ["tip1", "tip2"],
-  "confidenceScore": 1-10,
+  "recommendedPrice": "$2,997",
+  "priceJustification": "This price uses psychological anchoring and positions you as premium",
+  "valueStackTotal": "$7,500",
+  "pricingStrategy": "psychology-based",
+  "improvements": ["Add payment plan option", "Create urgency with limited spots"],
+  "psychologyTips": ["Use charm pricing ending in 7", "Show value comparison"],
+  "confidenceScore": 8,
   "alternativePricing": [
-    {"model": "One-time", "price": "$XXX", "pros": ["pro1"], "cons": ["con1"]},
-    {"model": "Payment plan", "price": "3x $XXX", "pros": ["pro1"], "cons": ["con1"]}
+    {"model": "One-time", "price": "$2,997", "pros": ["Higher profit margins"], "cons": ["Higher barrier to entry"]},
+    {"model": "Payment plan", "price": "3x $1,097", "pros": ["Lower barrier to entry"], "cons": ["Payment processing complexity"]}
   ]
 }`;
 
   try {
-    const analysis = await generateContent(prompt);
-    return analysis || getDefaultPricingAnalysis();
+    const rawResponse = await generateContent(prompt);
+    console.log('Raw pricing analysis response:', rawResponse);
+    
+    // Enhanced JSON parsing for pricing analysis
+    let analysis = null;
+    
+    if (typeof rawResponse === 'string') {
+      // Remove code blocks and extra formatting
+      let cleanResponse = rawResponse
+        .replace(/```json\n?/g, '')
+        .replace(/```\n?/g, '')
+        .replace(/^[^{]*/, '') // Remove text before first {
+        .replace(/[^}]*$/, '') // Remove text after last }
+        .trim();
+      
+      try {
+        analysis = JSON.parse(cleanResponse);
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        console.log('Attempted to parse:', cleanResponse);
+      }
+    } else if (typeof rawResponse === 'object') {
+      analysis = rawResponse;
+    }
+    
+    // Validate the analysis structure
+    if (analysis && analysis.recommendedPrice && analysis.confidenceScore) {
+      return analysis;
+    } else {
+      console.log('Invalid analysis structure, using fallback');
+      return getDefaultPricingAnalysis();
+    }
   } catch (error) {
     console.error('Pricing analysis error:', error);
     return getDefaultPricingAnalysis();
