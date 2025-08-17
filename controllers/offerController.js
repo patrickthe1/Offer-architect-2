@@ -1,12 +1,22 @@
 function assembleOffer(req, res) {
-  const { dreamOutcome, guarantee, bonuses, price } = req.body;
+  const { dreamOutcome, guarantee, bonus, bonuses, price } = req.body;
 
-  if (!dreamOutcome || !guarantee || !bonuses || !Array.isArray(bonuses) || bonuses.length === 0 || !price) {
-    return res.status(400).json({ error: 'Missing required fields: dreamOutcome, guarantee, bonuses (must be a non-empty array), and price.' });
+  // Handle both 'bonus' (single string from frontend) and 'bonuses' (array from API spec)
+  const bonusValue = bonus || bonuses;
+
+  if (!dreamOutcome || !guarantee || !bonusValue || !price) {
+    return res.status(400).json({ 
+      error: 'Missing required fields: dreamOutcome, guarantee, bonus/bonuses, and price.' 
+    });
   }
 
-  // A more robust way to join the bonuses array into a natural list
-  const bonusText = new Intl.ListFormat('en', { style: 'long', type: 'conjunction' }).format(bonuses);
+  // Handle both string and array formats for bonuses
+  let bonusText;
+  if (Array.isArray(bonusValue)) {
+    bonusText = new Intl.ListFormat('en', { style: 'long', type: 'conjunction' }).format(bonusValue);
+  } else {
+    bonusText = bonusValue;
+  }
 
   const finalOfferText = `Here's what you're going to get: You will ${dreamOutcome}. This is backed by our ${guarantee}. You will also receive these exclusive bonuses: ${bonusText}. The investment for this is ${price}.`;
 
